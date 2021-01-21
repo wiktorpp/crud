@@ -3,37 +3,62 @@ import signal
 import sys
 from getpass import getpass
 
+cnx = mysql.connector.connect(
+    user='root',
+    #password=getpass("hasło: "),
+    password="wikipass",
+    host='localhost',
+    database='test'
+)
+
 def exitWrapper(sig, frame):
     cnx.commit()
     cnx.close()
     print('exited')
     exit()
 
-def inputWrapper(force=False, default=None, prompt="?", dataType=None):
-    while True:
-        inputedData = input(prompt)
-        if inputedData == "":
-            if force:
-                sys.stdout.write(chr(0x07))
-                continue
+def validateInput(string, default=None, dataType=None):
+    if string == "":
+        if dataType == "str":
+            return ""
+        else:
+            return default
+    else:
+        if dataType == "float":
+            string = string.replace(",", ".")
+            try: float(string)
+            except:
+                return default
+            else:
+                return string
+        elif dataType == "id":
+            if isIdValid(string) == True:
+                return string
             else:
                 return default
         else:
-            if dataType == "float":
-                inputedData = inputedData.replace(",", ".")
-                try: float(inputedData)
-                except:
-                    sys.stdout.write(chr(0x07))
-                    continue
-                else:
-                    return inputedData
-            elif dataType == "id":
-                if isIdValid(inputedData) == True:
-                    return inputedData
-                else:
-                    sys.stdout.write(chr(0x07))
+            if string == None:
+                return default
             else:
-                return inputedData
+                return string
+
+def inputWrapper(prompt="?", default=None, dataType=None):
+    while True:
+        if dataType == "id":
+            string = input(prompt).upper()
+        else:
+            string = input(prompt)
+        string = validateInput(
+            string = string,
+            default = default,
+            dataType = dataType
+        )
+        if string == None:
+            sys.stdout.write(chr(0x07))
+            continue
+        else:
+            return string
+
 
 def stringify(string):
     return '"{}"'.format(string)
@@ -70,13 +95,7 @@ def updateProduct(product):
 
 signal.signal(signal.SIGINT, exitWrapper)
 
-cnx = mysql.connector.connect(
-    user='root',
-    #password=getpass("hasło: "),
-    password="wikipass",
-    host='localhost',
-    database='test'
-)
+
 
 print(
     "1 - Edytuj produkt\n"
@@ -90,14 +109,13 @@ while True:
     if action == "1":
         while True:
             id = inputWrapper(
-                force = True, 
                 prompt = "kod?",
                 dataType = "id",
             )
             product = fetchProduct(id)
             product["price"] = inputWrapper(
-                force = True,
                 prompt = "cena({})?".format(product["price"]),
+                default = product["price"],
                 dataType = "float"
             )
             updateProduct(product)
