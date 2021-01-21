@@ -2,6 +2,7 @@ import mysql.connector
 import signal
 import sys
 from getpass import getpass
+debug = True
 
 cnx = mysql.connector.connect(
     user='root',
@@ -17,32 +18,32 @@ def exitWrapper(sig, frame):
     print('exited')
     exit()
 
-def validateInput(string, default=None, dataType=None):
+def validateInput(string, dataType=None):
     if string == "":
         if dataType == "str":
             return ""
         else:
-            return default
+            return True
     else:
         if dataType == "float":
             string = string.replace(",", ".")
             try: float(string)
             except:
-                return default
+                return None
             else:
                 return string
         elif dataType == "id":
             if isIdValid(string) == True:
                 return string
             else:
-                return default
+                return None
         else:
             if string == None:
-                return default
+                return None
             else:
                 return string
 
-def inputWrapper(prompt="?", default=None, dataType=None):
+def inputWrapper(prompt="?", default=None, dataType=None, force=False):
     while True:
         if dataType == "id":
             string = input(prompt).upper()
@@ -50,10 +51,12 @@ def inputWrapper(prompt="?", default=None, dataType=None):
             string = input(prompt)
         string = validateInput(
             string = string,
-            default = default,
             dataType = dataType
         )
-        if string == None:
+
+        if string == True and not force:
+            return default
+        elif string == None or string == True:
             sys.stdout.write(chr(0x07))
             continue
         else:
@@ -111,6 +114,7 @@ while True:
             id = inputWrapper(
                 prompt = "kod?",
                 dataType = "id",
+                force = True
             )
             product = fetchProduct(id)
             product["price"] = inputWrapper(
@@ -118,6 +122,7 @@ while True:
                 default = product["price"],
                 dataType = "float"
             )
+            if debug: print(product)
             updateProduct(product)
             print("Zaaktualizowano!")
 
