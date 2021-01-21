@@ -43,7 +43,11 @@ def validateInput(string, dataType=None):
             else:
                 return string
 
-def inputWrapper(prompt="?", default=None, dataType=None, force=False):
+def inputWrapper(prompt="", default=None, dataType=None, force=False):
+    if default == None:
+        prompt = "{}?".format(prompt)
+    else:
+        prompt = "{}({})?".format(prompt, default)
     while True:
         if default == None:
             force = True
@@ -120,13 +124,13 @@ while True:
     if action == "1":
         while True:
             id = inputWrapper(
-                prompt = "kod?",
+                prompt = "kod",
                 dataType = "id",
                 force = True
             )
             product = fetchProduct(id)
             product["price"] = inputWrapper(
-                prompt = "cena({})?".format(product["price"]),
+                prompt = "cena",
                 default = product["price"],
                 dataType = "float"
             )
