@@ -45,6 +45,8 @@ def validateInput(string, dataType=None):
 
 def inputWrapper(prompt="?", default=None, dataType=None, force=False):
     while True:
+        if default == None:
+            force = True
         if dataType == "id":
             string = input(prompt).upper()
         else:
@@ -76,10 +78,16 @@ def fetchProduct(id):
         from produkt
         where kod = "{}"
     """.format(id))
-    return {
-        "id" : cursor._rows[0][0], 
-        "price" : float(cursor._rows[0][1])
-    }
+    try:
+        return {
+            "id" : cursor._rows[0][0], 
+            "price" : float(cursor._rows[0][1])
+        }
+    except:
+        return {
+            "id" : id,
+            "price" : None
+        }
 
 def updateProduct(product):
     cursor = cnx.cursor(buffered=True)
