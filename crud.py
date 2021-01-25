@@ -48,9 +48,9 @@ def inputWrapper(
     force=False
 ):
     if default == None:
-        prompt = "{}?".format(prompt)
+        prompt = f"{prompt}?"
     else:
-        prompt = "{}({})?".format(prompt, default)
+        prompt = f"{prompt}({default})?"
 
     while True:
         if default == None:
@@ -84,7 +84,7 @@ def fetchProduct(id):
         select *
         from produkt
         where kod = "{id}"
-    """
+    """)
     try:
         return {
             "id" : cursor._rows[0][0], 
