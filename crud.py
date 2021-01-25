@@ -23,7 +23,7 @@ def validateInput(string, dataType=None):
         if dataType == "str":
             return ""
         else:
-            return True
+            return None
     else:
         if dataType == "float":
             string = string.replace(",", ".")
@@ -80,17 +80,18 @@ def isIdValid(id):
 
 def fetchProduct(id):
     cursor = cnx.cursor(buffered=True)
-    cursor.execute("""
+    cursor.execute(f"""
         select *
         from produkt
-        where kod = "{}"
-    """.format(id))
+        where kod = "{id}"
+    """
     try:
         return {
             "id" : cursor._rows[0][0], 
             "price" : float(cursor._rows[0][1])
         }
     except:
+        if debug: print("Nowy produkt")
         return {
             "id" : id,
             "price" : None
@@ -98,21 +99,19 @@ def fetchProduct(id):
 
 def updateProduct(product):
     cursor = cnx.cursor(buffered=True)
-    cursor.execute("""
+    cursor.execute(f"""
         INSERT INTO produkt
-        VALUES ("{0}", {1})
-        ON DUPLICATE KEY UPDATE cena={1}; 
-    """.format(product["id"], product["price"]))
+        VALUES (\"{product['id']}\", {product['price']})
+        ON DUPLICATE KEY UPDATE cena={product['price']}; 
+    """)
     cnx.commit()
     cursor.close()
     return
 
 def printProduct(product):
     print(
-        (
-            "Kod: {}\n"
-            "Cena: {}"
-        ).format(product["id"], product["price"])
+        f"Kod: {product['id']}\n"
+        f"Cena: {product['price']}"
     )
 
 #import pdb; pdb.set_trace()
@@ -142,7 +141,6 @@ def printProductAction():
         force = True
     )
     product = fetchProduct(id)
-    if debug: print(product)
     printProduct(product)
 
 def mainAction():
