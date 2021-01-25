@@ -27,11 +27,9 @@ def validateInput(string, dataType=None):
     else:
         if dataType == "float":
             string = string.replace(",", ".")
-            try: float(string)
+            try: return float(string)
             except:
                 return None
-            else:
-                return string
         elif dataType == "id":
             if isIdValid(string) == True:
                 return string
