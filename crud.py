@@ -139,7 +139,7 @@ def printProductAction():
         force = True
     )
     product = fetchProduct(id)
-    print(product)
+    if debug: print(product)
     printProduct(product)
 
 def mainAction():
