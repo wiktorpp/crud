@@ -64,12 +64,15 @@ def inputWrapper(
             dataType = dataType
         )
 
-        if string == True and not force:
+        if debug: print("string: " + str(string))
+        if string == None and force == False:
+            if debug: print("Defaulting")
             return default
-        elif string == None or string == True:
+        elif string == None:
             sys.stdout.write(chr(0x07))
             continue
         else:
+            if debug: print("Input is valid")
             return string
 
 def isIdValid(id):
