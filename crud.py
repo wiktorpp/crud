@@ -12,7 +12,7 @@ cnx = mysql.connector.connect(
     database='test'
 )
 
-def exitWrapper(sig, frame):
+def exitWrapper(sig=None, frame=None):
     cnx.commit()
     cnx.close()
     print('exited')
@@ -43,11 +43,17 @@ def validateInput(string, dataType=None):
             else:
                 return string
 
-def inputWrapper(prompt="", default=None, dataType=None, force=False):
+def inputWrapper(
+    prompt="", 
+    default=None, 
+    dataType=None, 
+    force=False
+):
     if default == None:
         prompt = "{}?".format(prompt)
     else:
         prompt = "{}({})?".format(prompt, default)
+
     while True:
         if default == None:
             force = True
@@ -67,10 +73,6 @@ def inputWrapper(prompt="", default=None, dataType=None, force=False):
             continue
         else:
             return string
-
-
-def stringify(string):
-    return '"{}"'.format(string)
 
 def isIdValid(id):
     return len(id) == 3 and id.isalpha() and id.isupper()
