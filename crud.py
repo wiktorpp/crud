@@ -104,48 +104,72 @@ def updateProduct(product):
     cursor.close()
     return
 
-
+def printProduct(product):
+    print(
+        (
+            "Kod: {}\n"
+            "Cena: {}"
+        ).format(product["id"], product["price"])
+    )
 
 #import pdb; pdb.set_trace()
 
 signal.signal(signal.SIGINT, exitWrapper)
 
+def editProductAction():
+    id = inputWrapper(
+        prompt = "kod",
+        dataType = "id",
+        force = True
+    )
+    product = fetchProduct(id)
+    product["price"] = inputWrapper(
+        prompt = "cena",
+        default = product["price"],
+        dataType = "float"
+    )
+    if debug: print(product)
+    updateProduct(product)
+    print("Zaaktualizowano!")
 
+def printProductAction():
+    id = inputWrapper(
+        prompt = "kod",
+        dataType = "id",
+        force = True
+    )
+    product = fetchProduct(id)
+    print(product)
+    printProduct(product)
 
-print(
-    "1 - Edytuj produkt\n"
-    "2 - Sprzedaj produkt\n"
-    "9 - Debug\n"
-    "0 - Wyjdź"
-)
-while True:
-    action = input("?")
+def mainAction():
+    print(
+        "1 - Edytuj produkt\n"
+        "2 - Znajdź produkt\n"
+        "3 - Sprzedaj produkt\n"
+        "9 - Debug\n"
+        "0 - Wyjdź"
+    )
+    while True:
+        action = input("?")
 
-    if action == "1":
-        while True:
-            id = inputWrapper(
-                prompt = "kod",
-                dataType = "id",
-                force = True
-            )
-            product = fetchProduct(id)
-            product["price"] = inputWrapper(
-                prompt = "cena",
-                default = product["price"],
-                dataType = "float"
-            )
-            if debug: print(product)
-            updateProduct(product)
-            print("Zaaktualizowano!")
+        if action == "1":
+            while True:
+                editProductAction()
 
-    elif action == "9":
-        import pdb; pdb.set_trace()
-        break
+        if action == "2":
+            printProductAction()
 
-    elif action == "0":
-        exitWrapper(None, None)
-        
-    else:
-        print("\aNiepoprawne polecenie!")
+        elif action == "9":
+            import pdb; pdb.set_trace()
+            break
 
-exitWrapper(None, None)
+        elif action == "0":
+            exitWrapper(None, None)
+            
+        else:
+            print("\aNiepoprawne polecenie!")
+
+if __name__ == '__main__':
+    mainAction()
+    exitWrapper(None, None)
